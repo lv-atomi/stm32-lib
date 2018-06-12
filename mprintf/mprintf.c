@@ -12,15 +12,20 @@ void putc_strg(char character,char **buffer);
 static int vfprintf_(void (*) (char), const char *format, va_list arg); //generic print
 void long_itoa (long, int, int, void (*) (char)); //heavily used by printf_()
 
+USART_TypeDef * COM_MAIN = USART1;
 
-void putc_UART1 (char c)
+void set_COM_MAIN(USART_TypeDef * target){
+  COM_MAIN = target;
+}
+
+void putc_COM (char c)
 {
   if (c == '\n') {
-    while ((USART1->SR & USART_SR_TXE) == 0);  //blocks until previous byte was sent
-    USART1->DR ='\r';
+    while ((COM_MAIN->SR & USART_SR_TXE) == 0);  //blocks until previous byte was sent
+    COM_MAIN->DR ='\r';
   }
-  while ((USART1->SR & USART_SR_TXE) == 0);  //blocks until previous byte was sent
-  USART1->DR = c;
+  while ((COM_MAIN->SR & USART_SR_TXE) == 0);  //blocks until previous byte was sent
+  COM_MAIN->DR = c;
 }
 
 int printf_(const char *format, ...)
@@ -28,7 +33,7 @@ int printf_(const char *format, ...)
   va_list arg;
   
   va_start(arg, format);
-  vfprintf_((void(*)(char))(&putc_UART1), format, arg);
+  vfprintf_((void(*)(char))(&putc_COM), format, arg);
   va_end(arg);
 
   return 0;
