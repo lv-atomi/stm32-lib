@@ -4,7 +4,7 @@
 #include <stdarg.h>     // (...) parameter handling
 #include <stdlib.h>     //NULL pointer definition
 
-#include "stm32f10x.h"	// only this headerfile is used
+
 //#define assert_param(expr) ((void)0) /*dummy to make the stm32 header work*/
 
 char *SPRINTF_buffer;          //
