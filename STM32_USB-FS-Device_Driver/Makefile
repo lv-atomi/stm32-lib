@@ -27,17 +27,17 @@ ARFLAGS = cr
 LIB_OUT = libstm32usb.a
 
 LIB_OBJS = $(sort \
- $(patsubst %.c,%.o,$(shell find . -name "*.c")) # \
-# $(patsubst %.s,%.o,$(shell find . -name *.s)))
+ $(patsubst %.c,%.o,$(wildcard src/*.c)) \
+ $(patsubst %.s,%.o,$(wildcard src/*.s)))
+
 
 .PHONY: all
 all: $(LIB_OUT)
 
 $(LIB_OUT): $(LIB_OBJS)
-	echo $(LIB_OBJS)
 	$(AR) $(ARFLAGS) $@ $(LIB_OBJS)
 
-$(LIB_OBJS): $(shell find . -name *.[ch])
+$(LIB_OBJS): $(wildcard *.h) $(wildcard inc/*.h)
 
 .PHONY: clean
 clean:
