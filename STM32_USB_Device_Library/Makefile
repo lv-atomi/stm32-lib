@@ -8,7 +8,7 @@ endif
 
 TARGET_ARCH = -mcpu=cortex-m4 -mthumb
 WARNINGS = -Wall -W -Wshadow -Wwrite-strings -Winline
-INCLUDE_DIRS = -I inc -I ../CMSIS_CM4/Include -I ../STM32F4xx_StdPeriph_Driver -I ../STM32F4xx_StdPeriph_Driver/inc -I .
+INCLUDE_DIRS = -I Core/inc -I Class/audio/inc -I Class/msc/inc -I Class/cdc/inc -I Class/hid/inc -I Class/dfu/inc -I ../CMSIS_CM4/Include -I ../STM32F4xx_StdPeriph_Driver -I ../STM32F4xx_StdPeriph_Driver/inc
 F_NO_STRICT_ALIASING = -fno-strict-aliasing
 
 COMPILE_OPTS = $(WARNINGS) $(TARGET_OPTS) $(MESSAGES) $(F_NO_STRICT_ALIASING) $(INCLUDE_DIRS) $(DEFINES)
@@ -29,17 +29,17 @@ ARFLAGS = cr
 LIB_OUT = libstm32usb.a
 
 LIB_OBJS = $(sort \
- $(patsubst %.c,%.o,$(wildcard src/*.c)) \
- $(patsubst %.s,%.o,$(wildcard src/*.s)))
+ $(patsubst %.c,%.o,$(shell find . -name "*.c")))
 
 
 .PHONY: all
 all: $(LIB_OUT)
 
 $(LIB_OUT): $(LIB_OBJS)
+	echo $(LIB_OBJS)
 	$(AR) $(ARFLAGS) $@ $(LIB_OBJS)
 
-$(LIB_OBJS): $(wildcard *.h) $(wildcard inc/*.h)
+$(LIB_OBJS): $(shell find . -name *.h)
 
 .PHONY: clean
 clean:
