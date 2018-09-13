@@ -188,17 +188,17 @@ USBD_Class_cb_TypeDef  USBD_CDC_cb =
   usbd_cdc_Init,
   usbd_cdc_DeInit,
   NULL,
-  NULL,                 /* EP0_TxSent, */
-  NULL,//usbd_cdc_EP0_RxReady,
+  NULL,				/* EP0_TxSent, */
+  NULL,				//usbd_cdc_EP0_RxReady,
   usbd_cdc_DataIn,
   usbd_cdc_DataOut,
-  NULL,//usbd_cdc_SOF,
+  NULL,				//usbd_cdc_SOF,
   NULL,
   NULL,     
   USBD_cdc_GetCfgDesc,
 #ifdef USE_USB_OTG_HS   
-  USBD_cdc_GetOtherCfgDesc, /* use same cobfig as per FS */
-#endif /* USE_USB_OTG_HS  */
+  USBD_cdc_GetOtherCfgDesc,	/* use same config as per FS */
+#endif				/* USE_USB_OTG_HS  */
 };
 
 #ifdef USB_OTG_HS_INTERNAL_DMA_ENABLED
@@ -206,30 +206,89 @@ USBD_Class_cb_TypeDef  USBD_CDC_cb =
     #pragma data_alignment=4   
   #endif
 #endif /* USB_OTG_HS_INTERNAL_DMA_ENABLED */
+
 /* USB CDC device Configuration Descriptor */
 __ALIGN_BEGIN uint8_t usbd_cdc_CfgDesc[USB_CDC_CONFIG_DESC_SIZ]  __ALIGN_END =
 {
   0x09, /* bLength: Configuration Descriptor size */
   USB_CONFIGURATION_DESCRIPTOR_TYPE, /* bDescriptorType: Configuration */
-  USB_CDC_CONFIG_DESC_SIZ,
-  /* wTotalLength: Bytes returned */
+  USB_CDC_CONFIG_DESC_SIZ,           /* wTotalLength: Bytes returned */
   0x00,
-  0x01,         /*bNumInterfaces: 1 interface*/
+  0x02,         /*bNumInterfaces: 2 interface*/
   0x01,         /*bConfigurationValue: Configuration value*/
-  0x00,         /*iConfiguration: Index of string descriptor describing
-  the configuration*/
+  0x00,         /*iConfiguration: Index of string descriptor describing the configuration*/
   0xE0,         /*bmAttributes: bus powered and Support Remote Wake-up */
   0xFA,         /*MaxPower 500 mA: this current is used for detecting Vbus*/
-	//interface descriptor						// 接口描述符
-	0x09,															// 接口描述符长度,= 09H 	   Size of this descriptor in bytes = 09H
-	USB_INTERFACE_DESCRIPTOR_TYPE,		// 接口描述符类型,= 04H        interface descriptor type = 04H
-	0X00,															// 接口数,只有1个              Number of this interface, only one
-	0X00,															// 可选配置,只有1个            optional configuration, only one
-	0X02,															// 除端点0的端点索引数目,=04H  Number of endpoints used by this interface (excluding endpoint zero) = 04H
-	0xDC,															// 测试设备类型,= 0DCH         Class code = 0DCH
-	0xA0,															// 子类代码,= 0A0H             Subclass code = 0A0H
-	0xB0,															// 协议代码,= 0B0H             Protocol code = 0B0H
-	0X00,															// 字符串描述符索引            Index of string descriptor describing this interface
+
+
+
+
+  /*Interface Descriptor*/
+  0x09,   /* bLength: Interface Descriptor size */
+  USB_INTERFACE_DESCRIPTOR_TYPE,  /* bDescriptorType: Interface */
+  /* Interface descriptor type */
+  0x00,   /* bInterfaceNumber: Number of Interface */
+  0x00,   /* bAlternateSetting: Alternate setting */
+  0x01,   /* bNumEndpoints: One endpoints used */
+  0x02,   /* bInterfaceClass: Communication Interface Class */
+  0x02,   /* bInterfaceSubClass: Abstract Control Model */
+  0x01,   /* bInterfaceProtocol: Common AT commands */
+  0x00,   /* iInterface: */
+  
+  /*Header Functional Descriptor*/
+  0x05,   /* bLength: Endpoint Descriptor size */
+  0x24,   /* bDescriptorType: CS_INTERFACE */
+  0x00,   /* bDescriptorSubtype: Header Func Desc */
+  0x10,   /* bcdCDC: spec release number */
+  0x01,
+  
+  /*Call Management Functional Descriptor*/
+  0x05,   /* bFunctionLength */
+  0x24,   /* bDescriptorType: CS_INTERFACE */
+  0x01,   /* bDescriptorSubtype: Call Management Func Desc */
+  0x00,   /* bmCapabilities: D0+D1 */
+  0x01,   /* bDataInterface: 1 */
+  
+  /*ACM Functional Descriptor*/
+  0x04,   /* bFunctionLength */
+  0x24,   /* bDescriptorType: CS_INTERFACE */
+  0x02,   /* bDescriptorSubtype: Abstract Control Management desc */
+  0x02,   /* bmCapabilities */
+  
+  /*Union Functional Descriptor*/
+  0x05,   /* bFunctionLength */
+  0x24,   /* bDescriptorType: CS_INTERFACE */
+  0x06,   /* bDescriptorSubtype: Union func desc */
+  0x00,   /* bMasterInterface: Communication class interface */
+  0x01,   /* bSlaveInterface0: Data Class Interface */
+  
+  /*Endpoint 2 Descriptor*/
+  0x07,   /* bLength: Endpoint Descriptor size */
+  USB_ENDPOINT_DESCRIPTOR_TYPE,   /* bDescriptorType: Endpoint */
+  CDC_CMD_EP,   /* bEndpointAddress: (IN2) */
+  0x03,   /* bmAttributes: Interrupt */
+  8,      /* wMaxPacketSize: VIRTUAL_COM_PORT_INT_SIZE*/
+  0x00,
+  0x10,   /* bInterval: */
+
+
+
+
+  
+  //interface descriptor						// 接口描述符
+  0x09,					// 接口描述符长度,= 09H 	   Size of this descriptor in bytes = 09H
+  USB_INTERFACE_DESCRIPTOR_TYPE,	// 接口描述符类型,= 04H        interface descriptor type = 04H
+  0X01,					// 接口数,只有1个              Number of this interface, only one
+  0X00,					// 可选配置,只有1个            optional configuration, only one
+  0X02,					// 除端点0的端点索引数目,=04H  Number of endpoints used by this interface (excluding endpoint zero) = 04H
+  0x0A,   /* bInterfaceClass: CDC */
+  0x00,   /* bInterfaceSubClass: */
+  0x00,   /* bInterfaceProtocol: */
+  //  0xDC,					// 测试设备类型,= 0DCH         Class code = 0DCH
+  //  0xA0,					// 子类代码,= 0A0H             Subclass code = 0A0H
+  //  0xB0,					// 协议代码,= 0B0H             Protocol code = 0B0H
+  0X00,					// 字符串描述符索引            Index of string descriptor describing this interface
+  
   /*Endpoint OUT Descriptor*/
   0x07,   /* bLength: Endpoint Descriptor size */
   USB_ENDPOINT_DESCRIPTOR_TYPE,      /* bDescriptorType: Endpoint */
@@ -247,20 +306,20 @@ __ALIGN_BEGIN uint8_t usbd_cdc_CfgDesc[USB_CDC_CONFIG_DESC_SIZ]  __ALIGN_END =
   LOBYTE(CDC_DATA_MAX_PACKET_SIZE),  /* wMaxPacketSize: */
   HIBYTE(CDC_DATA_MAX_PACKET_SIZE),
   0x00                               /* bInterval: ignore for Bulk transfer */
-} ;
+};
 
 #ifdef USE_USB_OTG_HS
 #ifdef USB_OTG_HS_INTERNAL_DMA_ENABLED
   #if defined ( __ICCARM__ ) /*!< IAR Compiler */
     #pragma data_alignment=4   
   #endif
-#endif /* USB_OTG_HS_INTERNAL_DMA_ENABLED */ 
+#endif /* USB_OTG_HS_INTERNAL_DMA_ENABLED */
+
 __ALIGN_BEGIN uint8_t usbd_cdc_OtherCfgDesc[USB_CDC_CONFIG_DESC_SIZ]  __ALIGN_END =
 { 
   0x09, /* bLength: Configuration Descriptor size */
   USB_CONFIGURATION_DESCRIPTOR_TYPE, /* bDescriptorType: Configuration */
-  USB_CDC_CONFIG_DESC_SIZ,
-  /* wTotalLength: Bytes returned */
+  USB_CDC_CONFIG_DESC_SIZ,           /* wTotalLength: Bytes returned */
   0x00,
   0x01,         /*bNumInterfaces: 1 interface*/
   0x01,         /*bConfigurationValue: Configuration value*/
@@ -268,16 +327,18 @@ __ALIGN_BEGIN uint8_t usbd_cdc_OtherCfgDesc[USB_CDC_CONFIG_DESC_SIZ]  __ALIGN_EN
   the configuration*/
   0xE0,         /*bmAttributes: bus powered and Support Remote Wake-up */
   0xFA,         /*MaxPower 500 mA: this current is used for detecting Vbus*/
-	//interface descriptor						// 接口描述符
-	0x09,															// 接口描述符长度,= 09H 	   Size of this descriptor in bytes = 09H
-	USB_INTERFACE_DESCRIPTOR_TYPE,		// 接口描述符类型,= 04H        interface descriptor type = 04H
-	0X00,															// 接口数,只有1个              Number of this interface, only one
-	0X00,															// 可选配置,只有1个            optional configuration, only one
-	0X02,															// 除端点0的端点索引数目,=04H  Number of endpoints used by this interface (excluding endpoint zero) = 04H
-	0xDC,															// 测试设备类型,= 0DCH         Class code = 0DCH
-	0xA0,															// 子类代码,= 0A0H             Subclass code = 0A0H
-	0xB0,															// 协议代码,= 0B0H             Protocol code = 0B0H
-	0X00,															// 字符串描述符索引            Index of string descriptor describing this interface
+  
+  //interface descriptor						// 接口描述符
+  0x09,					// 接口描述符长度,= 09H 	   Size of this descriptor in bytes = 09H
+  USB_INTERFACE_DESCRIPTOR_TYPE,	// 接口描述符类型,= 04H        interface descriptor type = 04H
+  0X00,					// 接口数,只有1个              Number of this interface, only one
+  0X00,					// 可选配置,只有1个            optional configuration, only one
+  0X02,					// 除端点0的端点索引数目,=04H  Number of endpoints used by this interface (excluding endpoint zero) = 04H
+  0xDC,					// 测试设备类型,= 0DCH         Class code = 0DCH
+  0xA0,					// 子类代码,= 0A0H             Subclass code = 0A0H
+  0xB0,					// 协议代码,= 0B0H             Protocol code = 0B0H
+  0X00,					// 字符串描述符索引            Index of string descriptor describing this interface
+  
   /*Endpoint OUT Descriptor*/
   0x07,   /* bLength: Endpoint Descriptor size */
   USB_ENDPOINT_DESCRIPTOR_TYPE,      /* bDescriptorType: Endpoint */

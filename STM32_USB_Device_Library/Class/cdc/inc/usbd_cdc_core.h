@@ -45,8 +45,8 @@
 /** @defgroup usbd_cdc_Exported_Defines
   * @{
   */ 
-#define USB_CDC_CONFIG_DESC_SIZ                (32)
-#define USB_CDC_DESC_SIZ                       (32-9)
+#define USB_CDC_CONFIG_DESC_SIZ                (67)
+#define USB_CDC_DESC_SIZ                       (67-9)
 
 #define CDC_DESCRIPTOR_TYPE                     0x21
 
