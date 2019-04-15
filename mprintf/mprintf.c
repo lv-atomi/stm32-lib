@@ -21,11 +21,16 @@ void set_COM_MAIN(USART_TypeDef * target){
 void putc_COM (char c)
 {
   if (c == '\n') {
-    while ((COM_MAIN->SR & USART_SR_TXE) == 0);  //blocks until previous byte was sent
-    COM_MAIN->DR ='\r';
+    /* while ((COM_MAIN->SR & USART_SR_TXE) == 0);  //blocks until previous byte was sent */
+    /* COM_MAIN->DR ='\r'; */
+    USART_SendData(COM_MAIN, '\r');
+    while (USART_GetFlagStatus(COM_MAIN, USART_FLAG_TXE) == RESET) {}
   }
-  while ((COM_MAIN->SR & USART_SR_TXE) == 0);  //blocks until previous byte was sent
-  COM_MAIN->DR = c;
+  USART_SendData(COM_MAIN, c);  
+  while (USART_GetFlagStatus(COM_MAIN, USART_FLAG_TXE) == RESET) {}
+
+  /* while ((COM_MAIN->SR & USART_SR_TXE) == 0);  //blocks until previous byte was sent */
+  /* COM_MAIN->DR = c; */
 }
 
 int printf_(const char *format, ...)

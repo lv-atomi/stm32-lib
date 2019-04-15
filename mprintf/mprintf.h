@@ -8,6 +8,8 @@
 #include "stm32f10x.h"
 #elif defined(STM32F4XX)
 #include "stm32f4xx.h"
+#elif defined(STM32F030)
+#include "stm32f0xx.h"
 #else
 #error "device type missing!"
 #endif
