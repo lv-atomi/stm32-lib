@@ -13,9 +13,12 @@
 #else
 #error "device type missing!"
 #endif
+#include <stdarg.h>
 
 int printf_(const char *format, ...);
 int sprintf_(char *buffer, const char *format, ...);
+int vsprintf_(char *buffer, const char *format, va_list arg);
 void set_COM_MAIN(USART_TypeDef * target);
+
 
 #endif
