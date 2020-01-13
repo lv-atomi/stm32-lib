@@ -10,6 +10,7 @@
 char *SPRINTF_buffer;          //
 void putc_strg(char character,char **buffer);
 static int vfprintf_(void (*) (char), const char *format, va_list arg); //generic print
+int vsprintf_(char * buffer, const char * format, va_list arg);
 void long_itoa (long, int, int, void (*) (char)); //heavily used by printf_()
 
 USART_TypeDef * COM_MAIN = USART1;
@@ -48,14 +49,18 @@ int sprintf_(char *buffer, const char *format, ...)
 {
   va_list arg;
 
-  SPRINTF_buffer=buffer;	 //Pointer auf einen String in Speicherzelle abspeichern
-
   va_start(arg, format);
-  vfprintf_((void(*)(char))(&putc_strg), format, arg);
+  vsprintf_(buffer, format, arg);
   va_end(arg);
 
-  *SPRINTF_buffer ='\0';             // append end of string
+  return 0;
+}
 
+int vsprintf_(char * buffer, const char * format, va_list arg) {
+  SPRINTF_buffer=buffer;	 //Pointer auf einen String in Speicherzelle abspeichern
+  vfprintf_((void(*)(char))(&putc_strg), format, arg);
+  *SPRINTF_buffer ='\0';             // append end of string
+  
   return 0;
 }
 
@@ -97,8 +102,8 @@ void putc_strg(char character,char **buffer)
 {
   *SPRINTF_buffer = (char)character;	// just add the character to buffer
   SPRINTF_buffer++;
-
 }
+
 
 /*--------------------------------------------------------------------------------+
  * vfprintf_()
